@@ -66,7 +66,32 @@ class Plan {
     return max_prob;
   }
 
+  // TODO 根据当前max tile来计算出块概率
   float TryTiles(Board& board, int depth) {
+    int empty_tiles = 0;
+    float tile2_prob = 0, tile4_prob = 0, tile8_prob = 0, tile16_prob = 0;
+    auto max_tile = board.MaxRank();
+    
+    
+    for (int y = 0; y < N; ++y) {
+      for (int x = 0; x < N; ++x) {
+        if (board[x][y]) continue;
+        ++empty_tiles;
+        board[x][y] = 1;
+        tile2_prob += TryMoves(board, depth);
+        board[x][y] = 2;
+        tile4_prob += TryMoves(board, depth);
+        board[x][y] = 3;
+        tile8_prob += TryMoves(board, depth);
+        board[x][y] = 4;
+        tile16_prob += TryMoves(board, depth);
+        board[x][y] = 0;
+      }
+    }
+    return (tile2_prob * 0.7 + tile4_prob * 0.24 + tile8_prob * 0.05 + tile16_prob * 0.01) / empty_tiles;
+  }
+  
+  float TryTilesBackup(Board& board, int depth) {
     int empty_tiles = 0;
     float tile2_prob = 0, tile4_prob = 0;
     for (int y = 0; y < N; ++y) {

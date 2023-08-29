@@ -15,6 +15,34 @@
 #include "board.h"
 #include "cache.h"
 
+int TILE2 = 1;
+int TILE4 = 2;
+int TILE8 = 3;
+int TILE16 = 4;
+int TILE32 = 5;
+int TILE2048 = 11;
+int TILE4096 = 12;
+int TILE8192 = 13;
+
+pub auto get_prob_by_tile(auto const tile) {
+  if (tile >= TILE8192) {
+    
+  }else if (tile >= TILE4096) {
+    
+  }else if (tile >= TILE2048) {
+    
+  } else {
+    auto count = 0;
+     for (auto i =0; i < 256; i++) {
+        if (i % 4 == 0) {
+          count += 1;
+        }
+    }
+
+    return (count / 256.0);
+  }
+}
+
 struct Options {
   void UpdateMinProbFromDepth() { min_prob = 1.0 / (1 << (max_depth + 4)); }
 
@@ -111,21 +139,57 @@ class Node : public Board {
     return count;
   }
 
-  bool GenerateRandomTile() {
-    int num_empty_tiles = 0;
-    int empty_tiles[N * N];
-    for (int y = 0; y < N; ++y)
-      for (int x = 0; x < N; ++x)
-        if (board[x][y] == 0) empty_tiles[num_empty_tiles++] = x + y * N;
-    if (num_empty_tiles == 0) return false;
+//  bool GenerateRandomTile() {
+//    int num_empty_tiles = 0;
+//    int empty_tiles[N * N];
+//    for (int y = 0; y < N; ++y)
+//      for (int x = 0; x < N; ++x)
+//        if (board[x][y] == 0) empty_tiles[num_empty_tiles++] = x + y * N;
+//    if (num_empty_tiles == 0) return false;
+//
+//    int r = rand() % num_empty_tiles;
+//    rand_x = empty_tiles[r] % N;
+//    rand_y = empty_tiles[r] / N;
+//    board[rand_x][rand_y] = 1 + (rand() % 10 == 0);
+//    if (board[rand_x][rand_y] == 2) ++num_4_tiles;
+//    return true;
+//  }
 
-    int r = rand() % num_empty_tiles;
-    rand_x = empty_tiles[r] % N;
-    rand_y = empty_tiles[r] / N;
-    board[rand_x][rand_y] = 1 + (rand() % 10 == 0);
-    if (board[rand_x][rand_y] == 2) ++num_4_tiles;
-    return true;
-  }
+    bool GenerateRandomTile() {
+        int num_empty_tiles = 0;
+        int empty_tiles[N * N];
+        for (int y = 0; y < N; ++y)
+            for (int x = 0; x < N; ++x)
+                if (board[x][y] == 0) empty_tiles[num_empty_tiles++] = x + y * N;
+        if (num_empty_tiles == 0) return false;
+
+        // int rNumber = rand();
+        int rNumber = (rand() % (256-0+1))+ 0;
+        // 随机数值
+        int tile = TILE2;
+        int populated_value = this->MaxRank();
+        if ((populated_value >= TILE8192) && (rNumber % 6 == 0)) {
+            tile = TILE32;
+        } else if ((populated_value >= TILE4096) && (rNumber % 5 == 0)) {
+            tile = TILE16;
+        } else if ((populated_value >= TILE2048) && (rNumber % 4 == 0)) {
+            tile = TILE8;
+        } else if (rNumber % 4 == 0) {
+            tile = TILE4;
+        }
+        int next_tile = tile;
+        // 随机位置
+        int iNumber = (rand() % (256-0+1))+ 0;
+        int r = iNumber % num_empty_tiles;
+
+        //printf("next tile: populated_value=> %d, tile=> %d, next_tile=> %d, rNumber=> %d, index-Number %d\n", populated_value, tile, next_tile, rNumber, iNumber);
+
+        rand_x = empty_tiles[r] % N;
+        rand_y = empty_tiles[r] / N;
+        board[rand_x][rand_y] = next_tile;
+        if (board[rand_x][rand_y] == 2) ++num_4_tiles;
+        return true;
+    }
 
   void AddTile(int x, int y, bool is_four) {
     assert(board[x][y] == 0);

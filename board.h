@@ -88,6 +88,7 @@ class Board {
     return compact_board;
   }
 
+  // 返回最大值
   int MaxRank() const {
     int max_rank = 0;
     for (int y = 0; y < N; ++y)

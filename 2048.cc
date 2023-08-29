@@ -45,6 +45,7 @@ char GetKey() {
   return (buf);
 }
 
+// 交互式玩法，prob 出块概率
 int InteractivePlay(Node* n, int* move, float prob) {
   auto show_move = [](int move, float prob) {
     if (move >= 0)
